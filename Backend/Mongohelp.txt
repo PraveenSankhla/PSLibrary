@@ -1,0 +1,202 @@
+const mongoose = require("mongoose");
+
+
+// connect local dbs using mongoose 
+// mongoose is library for mongodb to stablish connection in our project
+// mongoose make it easy to connect 
+
+mongoose.connect("mongodb://localhost:27017/psinfo")
+    .then(
+        ()=>{
+            console.log("Connected");
+        })
+    .catch((err)=>{
+            console.log(err)
+        })
+
+
+// set schema for our table or data to add validation 
+
+const psinfo = new mongoose.Schema({
+    id : Number,
+    name : String,
+    gender : { 
+        type :String,
+        required:true
+    },
+    designation : String,
+    // date : {
+    //     type : Date,
+    //     default : Date.now
+    // }
+})
+
+
+
+// models for mongo schema
+// it defines a structure of document 
+// provide interface to create query update delete records etc
+
+
+// it is our first document that we store in our db
+const PsinfoModel = new mongoose.model( // model take two parameter
+    "Info",          // first parametr is name of collection 
+    psinfo          // schema that we made for our table
+) 
+
+
+
+// now here we go for insert documents in our db
+// insert first info
+
+const createdocument = async () =>{
+    try{
+        const Insertinfo = new PsinfoModel({
+            id : 1,
+            name : "Sharvan Kumar Sankhla",
+            gender : "Male",
+            designation : "Student",
+            // date : {
+            //     type : Date,
+            //     default : Date.now
+            // }
+        })
+        const output = await Insertinfo.save();
+        console.log(output)
+    }
+    catch{
+        console.log(err);
+    }
+}
+//createdocument();
+
+
+
+// to insert many document at one time
+const InsertManyDoc = async () =>{
+    try{
+        const Insertinfo1 = new PsinfoModel({
+            id : 2,
+            name : "Dheeraj Kumar Sankhla",
+            gender : "Male",
+            designation : "Student",
+        })
+
+        const Insertinfo2 = new PsinfoModel({
+            id : 3,
+            name : "Jyoti Udaniya",
+            gender : "Female",
+            designation : "Software Developer",
+        })
+
+        const Insertinfo3 = new PsinfoModel({
+            id : 1,
+            name : "Pooja Yadav",
+            gender : "Female",
+            designation : "Teacher",
+        })
+
+        const Insertinfo = new PsinfoModel({
+            id : 5,
+            name : "Lalit Pate;l",
+            gender : "Male",
+            designation : "SOftware developer",
+        })
+
+        const output = await PsinfoModel.insertMany([Insertinfo, Insertinfo1, Insertinfo2, Insertinfo3])
+        console.log(output)
+    }
+    catch{
+        console.log(err);
+    }
+}
+
+//InsertManyDoc()
+
+// now here we write two function that insert data in a db
+
+// now we write a function to take data using query
+
+const getDatafromDB = async()=>{
+    try{
+        // const data = await PsinfoModel.find()   --// all data get
+        const data = await PsinfoModel.find({id : 5})
+        console.log(data)
+    }
+    catch{
+        console.log(err)
+    }
+}
+
+//getDatafromDB();
+
+
+// comparision operator in  mongodb
+// $start with $ sign and in {} bracket
+const getDatawithComparision = async()=>{
+    try{
+        // conditional Operator in Mongo -->
+        //const data = await PsinfoModel.find({id : {$gt : 5}})      // -- greater then 5
+        // const data = await PsinfoModel.find({id : {$gte : 5}})      // -- greater and equal to 5
+        // const data = await PsinfoModel.find({id : {$lt : 5}})      // -- less then 5
+        // const data2 = await PsinfoModel.find({designation : {$in:["Software developer", "Student"]}})   // -- in operator to find in an specific value
+        // for not in $nin same as in only use $nin
+
+        // logical operator in mongo -->
+        // const data2 = await PsinfoModel.find({$or : [{name : "Praveen Kumar Sankhla"}, {id: 5}]}) -- or operator
+        // const data2 = await PsinfoModel.find({$and : [{name : "Praveen Kumar Sankhla"}, {id: 5}]})  //-- and operator
+
+        // limit()  use limit to how much data will be shown 
+
+        // count() found count of given query data
+        // const data2 = await PsinfoModel.find({$or : [{name : "Praveen Kumar Sankhla"}, {id: 5}]}).count()  
+        // countDocuments()   -- same above point 
+        // const data2 = await PsinfoModel.find().countDocuments() 
+        // sort() for sort data
+        // const data2 = await PsinfoModel.find().sort("name");  // -- for asending or
+        // const data2 = await PsinfoModel.find().sort({"name": 1});  // -- for asending 
+        const data2 = await PsinfoModel.find().sort({name: -1});  // -- for desending  
+
+
+        console.log(data2)
+    }
+    catch{
+        console.log(err)
+    }
+}
+
+// getDatawithComparision()
+
+
+// const UpdateData = async(id) =>{
+//     try{
+//         const data = await PsinfoModel.updateOne({id : id},{
+//             $set : {
+//                 designation : "Full-Stack Developer"
+//             }
+//         })
+//         console.log(data)
+//     }
+//     catch{
+//         console.log(err)
+//     }
+// }
+
+// UpdateData(1);
+
+
+const DeleteData = async(id) =>{
+    try{
+        const data = await PsinfoModel.deleteOne({id : id})
+        // const data = await PsinfoModel.deleteMany({id : id})
+
+        //to see what we deleted 
+        // const data = await PsinfoModel.findByIdAndDelete({id : id})
+        console.log(data)
+    }
+    catch{
+        console.log(err)
+    }
+}
+
+DeleteData(2);
